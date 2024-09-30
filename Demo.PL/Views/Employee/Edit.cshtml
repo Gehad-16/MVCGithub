@@ -1,0 +1,16 @@
+﻿@model Employee
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1> Edit Employee @Model.Name</h1>
+
+<form asp-action="Edit">
+  
+    <partial name="EmployeePartialViews/_CreateEditPV" />
+    <input type="submit" value="Edit" class="btn btn-primary" />
+    <a asp-action="Index" class="btn btn-light">Back To List</a>
+</form>
+
+
+

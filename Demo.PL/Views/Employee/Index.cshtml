@@ -1,0 +1,77 @@
+﻿@model IEnumerable<Employee>
+@{
+    ViewData["Title"] = "AllEmployees";
+}
+<a asp-action="Create" class="btn btn-success"> Add New Employee </a>
+<br/>
+
+@if (Model.Count()>0)
+{
+    <br />
+    <h1> All Employees </h1>
+    <br />
+    <div class="m-2">
+        <form class="row offset-2 "asp-action="Index">
+            <div class="col-8">
+                <input class="form-control" type="search" name="SearchValue" placeholder="Employee's"/>
+            </div>
+            <div class="col-4">
+                <input type="submit" class="btn btn-dark" value="Search"/>
+
+            </div>
+
+        </form>
+    </div>
+    <table class ="table table-light table-hover">
+        <thead class="table-dark">
+            <tr>
+                <td>@Html.DisplayNameFor(E => E.Name)</td>
+                <td>@Html.DisplayNameFor(E => E.Email)</td>
+                <td>@Html.DisplayNameFor(E => E.PhoneNumber)</td>
+                <td>@Html.DisplayNameFor(E => E.HiringDate)</td>
+                <td>@Html.DisplayNameFor(E => E.Address)</td>
+                <td>@Html.DisplayNameFor(E => E.Age)</td>
+                <td>@Html.DisplayNameFor(E => E.Salary)</td>
+                <td>@Html.DisplayNameFor(E => E.Departments)</td>
+                <td>@Html.DisplayNameFor(E => E.IsActive)</td>
+                <td>Details</td>
+                <td>Update</td>
+                <td>Delete</td>
+            </tr>
+        </thead>
+        <tbody >
+            @foreach (var E in Model)
+            {
+                <tr>
+                    <td>@E.Name</td>
+                    <td>@Html.DisplayFor(EE => E.Email)</td>
+                    <td>@E.PhoneNumber</td>
+                    <td>@E.HiringDate</td>
+                    <td>@E.Address</td>
+                    <td>@E.Age</td>
+                    <td>@Html.DisplayFor(EE => E.Salary)</td>
+                    <td>@Html.DisplayFor(EE => E.Departments.Name)</td>
+                    <td>
+                        @if(E.IsActive==true)
+                        {
+                            <i class="fa-solid fa-circle" style="color:green"></i>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-circle" style="color:red"></i>
+                        }
+                    </td>
+                    <partial name="_ButtonsPV" model="@E.Id" />
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="mt-5 alert alert-warning">
+        <h1>There Is No Employees </h1>
+    </div>
+}
+
+
