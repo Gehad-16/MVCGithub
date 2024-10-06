@@ -1,0 +1,11 @@
+﻿@model UserViewModel
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>  User @Model.FName @Model.LName  Details</h1>
+
+
+<partial name="UserPartialViews/_DetailsDeletePV" />
+<a asp-action="Edit" class="btn btn-primary">Edit</a>
+<a asp-action="Index" class="btn btn-light">Back To List</a>

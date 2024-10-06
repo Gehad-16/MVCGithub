@@ -1,9 +1,9 @@
-﻿@model Employee
+﻿@model EmployeeViewModel
 @{
     ViewData["Title"] = "Create";
 }
 <h1> Add New Employee</h1>
-<form asp-action="Create">
+<form asp-action="Create" enctype="multipart/form-data">
     <partial name="EmployeePartialViews/_CreateEditPV" />
     <input type="submit" value="Add" class="btn btn-primary" />
     <a asp-action="Index" class="btn btn-light">Back To List</a>

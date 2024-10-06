@@ -1,20 +1,28 @@
 ﻿using Demo.BLL.Interfaces;
 using Demo.DAL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Demo.PL.Controllers
 {
+    //يعني محدش ينفع يدخل هنا غير و هو عامل لوجين 
+    [Authorize]
     public class DepartmentController : Controller
     {
-        private readonly IDepartmentRepository _departmentRositoey;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DepartmentController(IDepartmentRepository departmentRositoey)
+        //private readonly IDepartmentRepository _departmentRositoey;
+
+        public DepartmentController(IUnitOfWork unitOfWork)
         {
-            _departmentRositoey = departmentRositoey;
+            //_departmentRositoey = departmentRositoey;
+            _unitOfWork = unitOfWork;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var departments=_departmentRositoey.GetAll();
+            var departments= await _unitOfWork.DepartmentRepository.GetAllAsync();
+           await _unitOfWork.CompleteAsync();
             return View(departments);
         }
 
@@ -26,23 +34,25 @@ namespace Demo.PL.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Department department)
+        public async Task<IActionResult> Create(Department department)
         {
             if (ModelState.IsValid)
             {
-                _departmentRositoey.Add(department);
+                await _unitOfWork.DepartmentRepository.AddAsync(department);
+                await _unitOfWork.CompleteAsync();
                 return RedirectToAction(nameof(Index));
+
             }
             return View(department);
            
         }
-        public IActionResult Details(int? id,string action="Details")
+        public async Task<IActionResult> Details(int? id,string action="Details")
         {
             if(id is null)
             {
                 return BadRequest(); //return 400
             }
-            var department = _departmentRositoey.GetById(id.Value);
+            var department =await _unitOfWork.DepartmentRepository.GetByIdAsync(id.Value);
             if(department is null)
             {
                 return NotFound();
@@ -52,7 +62,7 @@ namespace Demo.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             //if (id is null)
             //{
@@ -64,12 +74,12 @@ namespace Demo.PL.Controllers
             //    return NotFound();
             //}
             //return View(department);
-            return Details(id, "Edit");
+            return await Details(id, "Edit");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Department department ,[FromRoute] int id)
+        public async Task<IActionResult> Edit(Department department ,[FromRoute] int id)
         {
             if(id!=department.ID)
             {
@@ -79,7 +89,8 @@ namespace Demo.PL.Controllers
             {
                 try
                 {
-                    _departmentRositoey.Update(department);
+                    _unitOfWork.DepartmentRepository.Update(department);
+                    await _unitOfWork.CompleteAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch(System.Exception ex) 
@@ -93,37 +104,44 @@ namespace Demo.PL.Controllers
             return View(department);
         }
         [HttpGet]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
  
-            return Details(id, "Delete");
+            return await Details(id, "Delete");
         }
         [HttpPost]
-        public IActionResult Delete(Department department , [FromRoute] int id)
+        public async Task<IActionResult> Delete(Department department , [FromRoute] int id)
         {
             if (id != department.ID)
             {
                 return BadRequest();
             }
-           try
-                {
-                    _departmentRositoey.Delete(department);
-                    return RedirectToAction(nameof(Index));
+            else
+            {
+                _unitOfWork.DepartmentRepository.Delete(department);
+                await _unitOfWork.CompleteAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            //try
+            //     {
+            //     _unitOfWork.DepartmentRepository.Delete(department);
+            //     await _unitOfWork.CompleteAsync();
+            //     return RedirectToAction(nameof(Index));
 
-                }
-                catch (System.Exception ex)
-                {
-                    //form
-                    //string.Empty : the key is empty
-                    ModelState.AddModelError(string.Empty, ex.Message);
-                    return View(department);
-                }
+            //     }
+            //     catch (System.Exception ex)
+            //     {
+            //         //form
+            //         //string.Empty : the key is empty
+            //         ModelState.AddModelError(string.Empty, ex.Message);
+            //         return View(department);
+            //     }
 
-            
-           
-           
-           
-             
+
+
+
+
+
 
         }
 

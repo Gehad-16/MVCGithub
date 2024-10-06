@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Employee>
+﻿@model IEnumerable<EmployeeViewModel>
 @{
     ViewData["Title"] = "AllEmployees";
 }
@@ -25,6 +25,7 @@
     <table class ="table table-light table-hover">
         <thead class="table-dark">
             <tr>
+                <td>@Html.DisplayNameFor(E => E.EmployeeImage)</td>
                 <td>@Html.DisplayNameFor(E => E.Name)</td>
                 <td>@Html.DisplayNameFor(E => E.Email)</td>
                 <td>@Html.DisplayNameFor(E => E.PhoneNumber)</td>
@@ -43,6 +44,7 @@
             @foreach (var E in Model)
             {
                 <tr>
+                    <td><img src="~/Files/Images/@E.EmployeeImage" class="rounded" hight="40" width="40" alt="Employee Image"/></td>
                     <td>@E.Name</td>
                     <td>@Html.DisplayFor(EE => E.Email)</td>
                     <td>@E.PhoneNumber</td>
@@ -61,7 +63,7 @@
                             <i class="fa-solid fa-circle" style="color:red"></i>
                         }
                     </td>
-                    <partial name="_ButtonsPV" model="@E.Id" />
+                    <partial name="_ButtonsPV" model="@E.Id.ToString()" />
                 </tr>
             }
         </tbody>

@@ -19,37 +19,47 @@ namespace Demo.BLL.Repositories
         {
             _dbContext = dbContext;
         }
-        public int Add(T item)
+        public async Task AddAsync(T item)
         {
-            _dbContext.Add(item);
-            return _dbContext.SaveChanges();
+          await  _dbContext.AddAsync(item);
+           
         }
 
-        public int Delete(T item)
+        public void Delete(T item)
         {
             _dbContext.Remove(item);
-            return _dbContext.SaveChanges();
+          
         }
 
-        public IEnumerable<T> GetAll()
+        //public async Task<IEnumerable<T>> GetAll()
+        //{
+        //    if (typeof(T) == typeof(Employee))
+        //    {
+        //        var employees = await _dbContext.Employees.Include(e => e.Departments).ToListAsync();
+        //        return employees.Cast<T>(); // Use Cast<T>() to safely cast the list
+        //    }
+        //    return await _dbContext.Set<T>().ToListAsync(); // Use ToListAsync() in async methods
+        //}
+
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            if(typeof(T)==typeof(Employee))
+            if (typeof(T) == typeof(Employee))
             {
-                return (IEnumerable<T>)_dbContext.Employees.Include(E=>E.Departments).ToList();
+                return (IEnumerable<T>)await _dbContext.Employees.Include(E => E.Departments).ToListAsync();
             }
-            return _dbContext.Set<T>().ToList();
+            return await _dbContext.Set<T>().ToListAsync();
 
         }
 
-        public T GetById(int id)
+        public async Task<T> GetByIdAsync(int id)
         {
-            return _dbContext.Set<T>().Find(id);
+            return await _dbContext.Set<T>().FindAsync(id);
         }
 
-        public int Update(T item)
+        public void Update(T item)
         {
             _dbContext.Update(item);
-            return _dbContext.SaveChanges();
+           
         }
     }
 }

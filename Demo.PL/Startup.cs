@@ -1,9 +1,13 @@
 using Demo.BLL.Interfaces;
 using Demo.BLL.Repositories;
 using Demo.DAL.Contexts;
+using Demo.DAL.Models;
+using Demo.PL.MppingProfiles;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +36,29 @@ namespace Demo.PL
             services.AddDbContext<MVCDbContext>(options => { options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")); });
             services.AddScoped<IDepartmentRepository , DepartmentRepository>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-        }
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            //for Mapping
+            services.AddAutoMapper(M=>M.AddProfile(new EmployeeProfile())); 
+            services.AddAutoMapper(M => M.AddProfile(new UserProfile()));
+            services.AddAutoMapper(M => M.AddProfile(new RoleProfile()));
+
+            services.AddIdentity<AppUser, IdentityRole>(Options =>
+            {
+                Options.Password.RequireNonAlphanumeric = true;
+                Options.Password.RequireDigit = true;
+                Options.Password.RequireLowercase = true;
+                Options.Password.RequireUppercase = true;
+            }).AddEntityFrameworkStores<MVCDbContext>()
+              .AddDefaultTokenProviders();
+			//CookieAuthenticationDefaults.AuthenticationScheme ?? ????? ???? ????? ???????? ???? ????? ????? ??????? ???? 
+
+            // ???????? ??? ?????? ????? ?? ?? ??? ??? ???? ?? ?? ??? ?????? ??????? ??? ???? ??????? ??? ??? ?????? ????? ??? ???? ???? ????? ????  
+			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(Options=>
+            {
+                Options.LoginPath = "Account/Login"; //?? ??????? ?? ????? ?? ?????? ???
+                Options.AccessDeniedPath = "Home/Error"; // ?? ??????? ????? ?? ??? ??? ???? ?? ?? ???
+			});
+		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -52,13 +78,14 @@ namespace Demo.PL
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseAuthentication(); //???? ??? ??? ?????  MiddelWare
+            app.UseAuthorization();// ???? ??? ???????? ???? ?????? MiddelWare
 
-            app.UseEndpoints(endpoints =>
+			app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Account}/{action=Login}/{id?}");
             });
         }
     }
